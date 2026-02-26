@@ -85,7 +85,7 @@ exports.updateTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
     // Update task details
-    Object.assign(task, req.body); // e.g., { completed: true, feedback: "Good work" }
+    Object.assign(task, req.body); // e.g., {like jesy ky  completed: true, feedback: "Good work" }
     await intern.save();
 
     res.json(intern);
