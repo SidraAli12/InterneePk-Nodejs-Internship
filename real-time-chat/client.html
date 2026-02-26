@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Room</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f0f2f5;
+    }
+
+    #chat {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: white;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+      background: #dcf8c6;
+      width: fit-content;
+    }
+
+    .sender {
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Chat Room</h2>
+
+<input type="text" id="username" placeholder="Enter your name">
+<button onclick="joinChat()">Join</button>
+
+<div id="chat"></div>
+
+<input type="text" id="message" placeholder="Enter message">
+<button onclick="sendMessage()">Send</button>
+
+<!-- ✅ Scripts ALWAYS inside body before closing tag -->
+<script src="http://localhost:5000/socket.io/socket.io.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const socket = io("http://localhost:5000");
+  let username = "";
+
+  window.joinChat = function () {
+    username = document.getElementById("username").value;
+
+    if (!username) {
+      alert("Enter username first");
+      return;
+    }
+
+    socket.emit("joinRoom", "room1");
+    alert("Joined room successfully");
+  };
+
+  window.sendMessage = function () {
+
+    if (!username) {
+      alert("Please join first");
+      return;
+    }
+
+    const message = document.getElementById("message").value;
+
+    if (!message) return;
+
+    socket.emit("sendMessage", {
+      sender: username,
+      room: "room1",
+      message: message
+    });
+
+    document.getElementById("message").value = "";
+  };
+// window.sendMessage = function () {
+
+//   console.log("SEND BUTTON CLICKED");  // 🔥 MUST PRINT
+
+//   const message = document.getElementById("message").value;
+
+//   console.log("Message value:", message);  // 🔥 MUST PRINT
+
+//   socket.emit("sendMessage", {
+//     sender: username,
+//     room: "room1",
+//     message: message
+//   });
+
+// };
+
+  socket.on("receiveMessage", (data) => {
+    const chatBox = document.getElementById("chat");
+
+    const div = document.createElement("div");
+    div.classList.add("message");
+
+    div.innerHTML = `<span class="sender">${data.sender}:</span> ${data.message}`;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+});
+</script>
+
+</body>
+</html>
